@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDisplayName</key>
+	<string>GalaryGame</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>UILaunchScreen</key>
+	<dict/>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<!-- PhotoKit: full read/write access is required to count, analyze, sort and delete assets -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>GalaryGame reads your photo library on-device to find duplicates, blurry shots and screenshots, and to sort photos into albums. Your photos never leave your device.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>GalaryGame organizes your photos into albums to help you keep your gallery tidy.</string>
+</dict>
+</plist>

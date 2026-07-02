@@ -1,0 +1,21 @@
+# Xcode
+build/
+DerivedData/
+*.xcuserstate
+*.xcworkspace/xcuserdata/
+xcuserdata/
+
+# XcodeGen output (regenerate with `xcodegen generate`)
+*.xcodeproj
+
+# Swift Package Manager
+.build/
+Packages/
+Package.resolved
+
+# macOS
+.DS_Store
+
+# Fastlane / CI
+fastlane/report.xml
+fastlane/screenshots
