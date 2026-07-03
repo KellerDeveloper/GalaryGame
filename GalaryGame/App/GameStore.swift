@@ -149,4 +149,17 @@ final class GameStore {
         let existing = (try? modelContext.fetch(FetchDescriptor<Achievement>())) ?? []
         return Set(existing.compactMap { $0.achievementID })
     }
+
+    // MARK: - Leaderboard opt-in
+
+    func enableLeaderboard(name: String) {
+        profile.displayName = name
+        profile.isLeaderboardEnabled = true
+        try? modelContext.save()
+    }
+
+    func disableLeaderboard() {
+        profile.isLeaderboardEnabled = false
+        try? modelContext.save()
+    }
 }

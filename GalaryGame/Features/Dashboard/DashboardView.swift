@@ -8,6 +8,7 @@ struct DashboardView: View {
 
     @State private var model: DashboardViewModel
     @State private var triage: TriageSession?
+    @State private var showAlbumSort = false
 
     init(store: GameStore, photos: PhotoLibraryService) {
         self.store = store
@@ -36,6 +37,11 @@ struct DashboardView: View {
             .refreshable { await model.quickScan() }
             .fullScreenCover(item: $triage) { session in
                 SwipeTriageView(session: session, photos: photos, store: store) {
+                    Task { await model.quickScan() }
+                }
+            }
+            .fullScreenCover(isPresented: $showAlbumSort) {
+                AlbumSortView(assets: model.unsortedAssets, photos: photos, store: store) {
                     Task { await model.quickScan() }
                 }
             }
@@ -110,6 +116,9 @@ struct DashboardView: View {
                 Text("Убраться").font(.headline)
                 actionButton("iphone", "Разобрать скриншоты", count: model.screenshotAssets.count) {
                     triage = TriageSession(type: .screenshot, assets: model.screenshotAssets)
+                }
+                actionButton("rectangle.stack.badge.plus", "Разложить по альбомам", count: model.unsortedAssets.count) {
+                    showAlbumSort = true
                 }
                 actionButton("square.on.square", "Найти дубликаты", count: nil) {
                     Task {

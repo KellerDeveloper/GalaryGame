@@ -34,10 +34,13 @@ GalaryGame/
   App/            — точка входа, SwiftData-контейнер, GameStore (координатор), RootView
   Models/         — @Model-сущности (UserProfile, CleanupEvent, Achievement, Quest) + enum'ы
   Engine/         — ЧИСТАЯ логика без зависимостей: ScoringEngine, GamificationEngine, QuestFactory
-  Services/       — PhotoLibraryService (PhotoKit), ClutterAnalyzer (Vision/Core Image)
-  Features/       — экраны: Onboarding, Dashboard, Cleanup (свайп-триаж), Achievements, Garden
+  Services/       — PhotoLibraryService (PhotoKit), ClutterAnalyzer (Vision/Core Image),
+                    FileCleanupService (сканер файлов), LeaderboardService (Supabase REST)
+  Features/       — экраны: Onboarding, Dashboard, Cleanup (свайп-триаж + раскладка
+                    по альбомам), Files, Achievements, Garden, Leaderboard
   DesignSystem/   — Theme, DOSRing, AssetImage, Card
-GalaryGameTests/  — юнит-тесты чистой логики (движки, квесты)
+supabase/migrations/ — SQL схема лидерборда (RLS)
+GalaryGameTests/  — юнит-тесты чистой логики (движки, квесты, файловый сканер)
 ```
 
 **Поток данных:** UI → `GameStore.recordCleanup(...)` → `ScoringEngine`/`GamificationEngine`
@@ -60,12 +63,24 @@ GalaryGameTests/  — юнит-тесты чистой логики (движк�
 
 | Что | Статус | Как |
 |---|---|---|
-| Галерея | ✅ полный доступ | PhotoKit: счёт, детект, удаление (системный диалог), альбомы |
-| Красивый рабочий стол | ❌ нельзя читать домашний экран | план: загрузка скриншота + Vision (Фаза 6) |
-| Файлы/загрузки | ⚠️ песочница | план: `UIDocumentPicker` по выбранным папкам (Фаза 6) |
+| Галерея | ✅ полный доступ | PhotoKit: счёт, детект, удаление (системный диалог), **раскладка по альбомам** |
+| Файлы/загрузки | ✅ выбранная папка | `.fileImporter` по папкам «Файлов» (iCloud Drive / «На iPhone»); общая «Загрузки» и кэш мессенджеров недоступны |
+| Красивый рабочий стол | ❌ нельзя читать домашний экран | план: загрузка скриншота + Vision |
 | «Недавно удалённые» | ⚠️ контент недоступен публично | метрика `recentlyDeleted` = 0 |
 
-## Дальше (Фаза 6+)
+## Облачный рейтинг (Supabase, opt-in)
 
-Режим «рабочий стол» (скриншот + Vision), режим «файлы» (document picker),
-облачный рейтинг очков через Supabase (opt-in, без фото), локализация RU/EN, freemium.
+Синхронизируются **только** имя + XP + рейтинг порядка. Фото и метаданные галереи
+никогда не отправляются. Off по умолчанию.
+
+1. Применить схему: `supabase/migrations/0001_leaderboard.sql` (Supabase MCP
+   `apply_migration`, `supabase db push` или SQL-редактор дашборда).
+2. Заполнить `GalaryGame/App/SupabaseConfig.swift` — `url` и `anonKey` проекта
+   (anon-ключ публичный по дизайну, доступ ограничен RLS).
+
+Пока ключи пустые, `LeaderboardService` безопасно no-op'ит, а экран «Рейтинг»
+показывает «не настроен» — остальное приложение работает как обычно.
+
+## Дальше
+
+Режим «рабочий стол» (скриншот + Vision), локализация RU/EN, freemium.

@@ -81,10 +81,7 @@ final class PhotoLibraryService {
     /// `recentlyDeleted` is left at 0 here.
     func collectBaseMetrics(from assets: [PHAsset]) -> GalleryMetrics {
         let screenshots = assets.reduce(into: 0) { $0 += isScreenshot($1) ? 1 : 0 }
-        let sortedIDs = identifiersInUserAlbums()
-        let unsorted = assets.reduce(into: 0) { partial, asset in
-            if !sortedIDs.contains(asset.localIdentifier) { partial += 1 }
-        }
+        let unsorted = unsortedImageAssets(from: assets).count
         return GalleryMetrics(
             totalPhotos: assets.count,
             duplicates: 0,
@@ -104,6 +101,35 @@ final class PhotoLibraryService {
             assets.enumerateObjects { asset, _, _ in ids.insert(asset.localIdentifier) }
         }
         return ids
+    }
+
+    /// Image assets that belong to no user album — the "sort me" backlog.
+    func unsortedImageAssets(from assets: [PHAsset]) -> [PHAsset] {
+        let sortedIDs = identifiersInUserAlbums()
+        return assets.filter { !sortedIDs.contains($0.localIdentifier) }
+    }
+
+    /// Lightweight description of a user album for the sort UI.
+    struct AlbumInfo: Identifiable {
+        let collection: PHAssetCollection
+        let title: String
+        let count: Int
+        var id: String { collection.localIdentifier }
+    }
+
+    /// All user-created albums with titles and item counts.
+    func userAlbums() -> [AlbumInfo] {
+        var result: [AlbumInfo] = []
+        let albums = PHAssetCollection.fetchAssetCollections(with: .album, subtype: .any, options: nil)
+        albums.enumerateObjects { collection, _, _ in
+            let count = PHAsset.fetchAssets(in: collection, options: nil).count
+            result.append(AlbumInfo(
+                collection: collection,
+                title: collection.localizedTitle ?? "Без названия",
+                count: count
+            ))
+        }
+        return result.sorted { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
     }
 
     // MARK: - Image loading (for analysis / thumbnails)
@@ -146,10 +172,21 @@ final class PhotoLibraryService {
     func addAssets(_ assets: [PHAsset], toAlbumNamed name: String) async throws {
         guard !assets.isEmpty else { return }
         let collection = try await albumNamed(name) ?? (try await createAlbum(named: name))
+        try await addAssets(assets, to: collection)
+    }
+
+    /// Add assets to an existing album collection.
+    func addAssets(_ assets: [PHAsset], to collection: PHAssetCollection) async throws {
+        guard !assets.isEmpty else { return }
         try await PHPhotoLibrary.shared().performChanges {
             guard let request = PHAssetCollectionChangeRequest(for: collection) else { return }
             request.addAssets(assets as NSArray)
         }
+    }
+
+    /// Create a new empty album and return it.
+    func createAlbum(titled name: String) async throws -> PHAssetCollection {
+        try await createAlbum(named: name)
     }
 
     private func albumNamed(_ name: String) async -> PHAssetCollection? {

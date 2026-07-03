@@ -39,6 +39,9 @@ struct MainTabView: View {
             DashboardView(store: store, photos: photos)
                 .tabItem { Label("Порядок", systemImage: "chart.pie.fill") }
 
+            FilesView(store: store)
+                .tabItem { Label("Файлы", systemImage: "folder.fill") }
+
             AchievementsView(store: store)
                 .tabItem { Label("Награды", systemImage: "trophy.fill") }
 

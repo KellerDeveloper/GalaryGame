@@ -18,6 +18,15 @@ struct AchievementsView: View {
                 .padding()
             }
             .navigationTitle("Награды")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    NavigationLink {
+                        LeaderboardView(store: store)
+                    } label: {
+                        Label("Рейтинг", systemImage: "trophy")
+                    }
+                }
+            }
         }
     }
 

@@ -39,6 +39,10 @@ final class DashboardViewModel {
         assets.filter { photos.isScreenshot($0) }
     }
 
+    var unsortedAssets: [PHAsset] {
+        photos.unsortedImageAssets(from: assets)
+    }
+
     /// Heavy scan for near-duplicates using Vision feature prints.
     /// Returns the assets that are members of a duplicate group.
     func findDuplicates() async -> [PHAsset] {
