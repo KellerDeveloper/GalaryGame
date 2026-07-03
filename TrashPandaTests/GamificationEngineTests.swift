@@ -1,5 +1,5 @@
 import XCTest
-@testable import GalaryGame
+@testable import TrashPanda
 
 final class GamificationEngineTests: XCTestCase {
 
@@ -65,17 +65,28 @@ final class GamificationEngineTests: XCTestCase {
         XCTAssertEqual(Rank.rank(forXP: 100), .novice)
         XCTAssertEqual(Rank.rank(forXP: 999), .organizer)
         XCTAssertEqual(Rank.rank(forXP: 2500), .zenMaster)
+        // Prestige ranks above Дзен-мастер.
+        XCTAssertEqual(Rank.rank(forXP: 4999), .zenMaster)
+        XCTAssertEqual(Rank.rank(forXP: 5000), .curator)
+        XCTAssertEqual(Rank.rank(forXP: 10000), .archivist)
+        XCTAssertEqual(Rank.rank(forXP: 25000), .legend)
+        XCTAssertEqual(Rank.rank(forXP: 999999), .legend)
     }
 
     func testRankUpDetection() {
         XCTAssertTrue(GamificationEngine.didRankUp(from: 90, to: 120))
         XCTAssertFalse(GamificationEngine.didRankUp(from: 120, to: 140))
+        // Crossing into a prestige rank counts as a rank-up.
+        XCTAssertTrue(GamificationEngine.didRankUp(from: 4900, to: 5100))
     }
 
     func testRankProgress() {
         // 250 XP: between novice(100) and organizer(400) → 150/300 = 0.5
         XCTAssertEqual(Rank.novice.progress(towardNextFrom: 250), 0.5, accuracy: 0.0001)
-        XCTAssertEqual(Rank.zenMaster.progress(towardNextFrom: 9999), 1.0)
+        // zenMaster(2500) → curator(5000): 3750 XP → 1250/2500 = 0.5
+        XCTAssertEqual(Rank.zenMaster.progress(towardNextFrom: 3750), 0.5, accuracy: 0.0001)
+        // legend is the top rank → always 1.0
+        XCTAssertEqual(Rank.legend.progress(towardNextFrom: 999999), 1.0)
     }
 
     // MARK: - Achievements
@@ -83,8 +94,9 @@ final class GamificationEngineTests: XCTestCase {
     func testAchievementUnlocks() {
         let stats = PlayerStats(
             duplicatesDeleted: 100, screenshotsTriaged: 200,
-            storageFreedBytes: 1_024 * 1_024 * 1_024,
-            streakCount: 7, unsortedPhotos: 0, totalActions: 12)
+            storageFreedBytes: 10 * 1_024 * 1_024 * 1_024,
+            streakCount: 100, unsortedPhotos: 0, totalActions: 12,
+            photosSorted: 100)
         let unlocked = GamificationEngine.unlockedAchievements(for: stats)
         XCTAssertTrue(unlocked.contains(.firstClean))
         XCTAssertTrue(unlocked.contains(.hundredDuplicates))
@@ -92,6 +104,24 @@ final class GamificationEngineTests: XCTestCase {
         XCTAssertTrue(unlocked.contains(.weekStreak))
         XCTAssertTrue(unlocked.contains(.freedOneGig))
         XCTAssertTrue(unlocked.contains(.screenshotSlayer))
+        XCTAssertTrue(unlocked.contains(.hundredDayStreak))
+        XCTAssertTrue(unlocked.contains(.freedTenGigs))
+        XCTAssertTrue(unlocked.contains(.sortedHundred))
+    }
+
+    /// Prestige-tier achievements must NOT unlock at the lower tiers.
+    func testPrestigeAchievementsNeedHigherThresholds() {
+        let stats = PlayerStats(
+            duplicatesDeleted: 0, screenshotsTriaged: 0,
+            storageFreedBytes: 1_024 * 1_024 * 1_024, // exactly 1 GB
+            streakCount: 7, unsortedPhotos: 5, totalActions: 3,
+            photosSorted: 99)
+        let unlocked = GamificationEngine.unlockedAchievements(for: stats)
+        XCTAssertTrue(unlocked.contains(.freedOneGig))
+        XCTAssertTrue(unlocked.contains(.weekStreak))
+        XCTAssertFalse(unlocked.contains(.freedTenGigs))
+        XCTAssertFalse(unlocked.contains(.hundredDayStreak))
+        XCTAssertFalse(unlocked.contains(.sortedHundred))
     }
 
     func testNoAchievementsForFreshPlayer() {

@@ -36,6 +36,7 @@ struct SwipeTriageView: View {
                 summary
             } else {
                 deck
+                if !toDelete.isEmpty { finishBar }
                 controls
             }
         }
@@ -109,6 +110,21 @@ struct SwipeTriageView: View {
         .padding(.bottom, 32)
     }
 
+    /// Always-reachable "finish early" button: commit whatever is marked for
+    /// deletion so far without having to swipe the whole deck to the end.
+    private var finishBar: some View {
+        Button {
+            Task { await commit() }
+        } label: {
+            Text(committing ? "Удаляем…" : "Готово · удалить \(toDelete.count)")
+                .font(.headline).frame(maxWidth: .infinity).padding(.vertical, 14)
+        }
+        .background(Theme.danger, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .foregroundStyle(.white)
+        .disabled(committing)
+        .padding(.horizontal, 24)
+    }
+
     // MARK: - States
 
     private var emptyState: some View {
@@ -156,8 +172,9 @@ struct SwipeTriageView: View {
             // iOS shows its own confirmation sheet here.
             freed = (try? await photos.delete(toDelete)) ?? 0
         }
-        // The number of graded items depends on the cleanup type.
-        let count = session.type == .screenshot ? session.assets.count : toDelete.count
+        // The number of graded items depends on the cleanup type. Use the count
+        // actually reviewed (`index`) so an early finish doesn't over-reward.
+        let count = session.type == .screenshot ? index : toDelete.count
         store.recordCleanup(type: session.type, count: count, bytesFreed: freed)
         if freed > 0 {
             store.recordCleanup(type: .storageFreed, count: 0, bytesFreed: freed)

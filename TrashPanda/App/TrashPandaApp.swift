@@ -2,7 +2,7 @@ import SwiftUI
 import SwiftData
 
 @main
-struct GalaryGameApp: App {
+struct TrashPandaApp: App {
 
     /// Single SwiftData container for all persisted game state.
     let container: ModelContainer = {

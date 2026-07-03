@@ -123,8 +123,9 @@ final class GameStore {
         for e in events {
             stats.totalActions += 1
             switch e.type {
-            case .duplicate:  stats.duplicatesDeleted += e.count
-            case .screenshot: stats.screenshotsTriaged += e.count
+            case .duplicate:   stats.duplicatesDeleted += e.count
+            case .screenshot:  stats.screenshotsTriaged += e.count
+            case .sortToAlbum: stats.photosSorted += e.count
             default: break
             }
         }

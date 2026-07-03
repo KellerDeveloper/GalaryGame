@@ -9,6 +9,9 @@ enum AchievementID: String, CaseIterable, Identifiable {
     case weekStreak          // 7-day streak
     case freedOneGig         // freed 1 GB lifetime
     case screenshotSlayer    // triaged 200 screenshots
+    case hundredDayStreak    // 100-day streak
+    case freedTenGigs        // freed 10 GB lifetime
+    case sortedHundred       // sorted 100 photos into albums lifetime
 
     var id: String { rawValue }
 
@@ -20,6 +23,9 @@ enum AchievementID: String, CaseIterable, Identifiable {
         case .weekStreak:        return "Неделя без мусора"
         case .freedOneGig:       return "Освободил гигабайт"
         case .screenshotSlayer:  return "Гроза скриншотов"
+        case .hundredDayStreak:  return "Сто дней порядка"
+        case .freedTenGigs:      return "Десять гигабайт свободы"
+        case .sortedHundred:     return "Архитектор альбомов"
         }
     }
 
@@ -31,6 +37,9 @@ enum AchievementID: String, CaseIterable, Identifiable {
         case .weekStreak:        return "Убирайся 7 дней подряд"
         case .freedOneGig:       return "Освободи 1 ГБ памяти"
         case .screenshotSlayer:  return "Разбери 200 скриншотов"
+        case .hundredDayStreak:  return "Держи стрик 100 дней"
+        case .freedTenGigs:      return "Освободи 10 ГБ памяти"
+        case .sortedHundred:     return "Разложи 100 фото по альбомам"
         }
     }
 
@@ -42,6 +51,9 @@ enum AchievementID: String, CaseIterable, Identifiable {
         case .weekStreak:        return "flame"
         case .freedOneGig:       return "externaldrive.badge.checkmark"
         case .screenshotSlayer:  return "bolt.shield"
+        case .hundredDayStreak:  return "flame.circle.fill"
+        case .freedTenGigs:      return "externaldrive.fill.badge.checkmark"
+        case .sortedHundred:     return "rectangle.stack.fill.badge.plus"
         }
     }
 }

@@ -171,7 +171,12 @@ final class PhotoLibraryService {
     /// Create a named album (if needed) and add assets to it.
     func addAssets(_ assets: [PHAsset], toAlbumNamed name: String) async throws {
         guard !assets.isEmpty else { return }
-        let collection = try await albumNamed(name) ?? (try await createAlbum(named: name))
+        let collection: PHAssetCollection
+        if let existing = await albumNamed(name) {
+            collection = existing
+        } else {
+            collection = try await createAlbum(named: name)
+        }
         try await addAssets(assets, to: collection)
     }
 

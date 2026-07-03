@@ -27,7 +27,7 @@ struct DashboardView: View {
                 }
                 .padding()
             }
-            .navigationTitle("GalaryGame")
+            .navigationTitle("Trash Panda")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     if model.isScanning { ProgressView() }

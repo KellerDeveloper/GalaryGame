@@ -1,5 +1,5 @@
 import XCTest
-@testable import GalaryGame
+@testable import TrashPanda
 
 final class FileCleanupServiceTests: XCTestCase {
 

@@ -130,7 +130,7 @@ struct FilesView: View {
         let toDelete = selectedItems
         do {
             let freed = try service.delete(toDelete)
-            store.recordCleanup(type: .storageFreed, bytesFreed: freed)
+            store.recordCleanup(type: .storageFreed, count: toDelete.count, bytesFreed: freed)
             let deletedIDs = Set(toDelete.map(\.id))
             items.removeAll { deletedIDs.contains($0.id) }
             selected.removeAll()

@@ -8,6 +8,9 @@ enum Rank: Int, Codable, CaseIterable, Comparable, Identifiable {
     case organizer      // Организатор
     case minimalist     // Минималист
     case zenMaster      // Дзен-мастер
+    case curator        // Куратор (престиж)
+    case archivist      // Архивариус (престиж)
+    case legend         // Легенда порядка (престиж)
 
     var id: Int { rawValue }
 
@@ -19,6 +22,9 @@ enum Rank: Int, Codable, CaseIterable, Comparable, Identifiable {
         case .organizer:  return 400
         case .minimalist: return 1000
         case .zenMaster:  return 2500
+        case .curator:    return 5000
+        case .archivist:  return 10000
+        case .legend:     return 25000
         }
     }
 
@@ -29,6 +35,9 @@ enum Rank: Int, Codable, CaseIterable, Comparable, Identifiable {
         case .organizer:  return "Организатор"
         case .minimalist: return "Минималист"
         case .zenMaster:  return "Дзен-мастер"
+        case .curator:    return "Куратор"
+        case .archivist:  return "Архивариус"
+        case .legend:     return "Легенда порядка"
         }
     }
 
@@ -39,6 +48,9 @@ enum Rank: Int, Codable, CaseIterable, Comparable, Identifiable {
         case .organizer:  return "square.grid.2x2"
         case .minimalist: return "circle.dashed"
         case .zenMaster:  return "sparkles"
+        case .curator:    return "crown"
+        case .archivist:  return "books.vertical.fill"
+        case .legend:     return "laurel.leading"
         }
     }
 

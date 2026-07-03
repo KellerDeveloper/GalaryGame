@@ -8,6 +8,8 @@ struct PlayerStats: Equatable {
     var streakCount: Int = 0
     var unsortedPhotos: Int = 0
     var totalActions: Int = 0
+    /// Photos moved into albums, lifetime.
+    var photosSorted: Int = 0
 }
 
 /// The outcome of applying a day's activity to a streak.
@@ -70,6 +72,9 @@ enum GamificationEngine {
         if stats.streakCount >= 7 { result.insert(.weekStreak) }
         if stats.storageFreedBytes >= 1_024 * 1_024 * 1_024 { result.insert(.freedOneGig) }
         if stats.screenshotsTriaged >= 200 { result.insert(.screenshotSlayer) }
+        if stats.streakCount >= 100 { result.insert(.hundredDayStreak) }
+        if stats.storageFreedBytes >= 10 * 1_024 * 1_024 * 1_024 { result.insert(.freedTenGigs) }
+        if stats.photosSorted >= 100 { result.insert(.sortedHundred) }
         return result
     }
 }

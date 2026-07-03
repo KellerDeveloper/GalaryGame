@@ -1,4 +1,4 @@
--- GalaryGame cloud leaderboard (opt-in, scores only — no photos, no PII beyond
+-- TrashPanda cloud leaderboard (opt-in, scores only — no photos, no PII beyond
 -- a self-chosen display name).
 --
 -- Apply with either:
